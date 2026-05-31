@@ -1,0 +1,175 @@
+
+CREATE DATABASE Inventsoft;
+USE Inventsoft;
+
+
+CREATE TABLE Usuarios (
+    ID_Usuario INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(100),
+    Apellido VARCHAR(100),
+    Telefono VARCHAR(15),
+    Foto VARCHAR(100),
+    Estado ENUM('Activo', 'Inactivo')
+    
+);
+
+
+
+
+CREATE TABLE Credenciales(
+    ID_Credencial INT AUTO_INCREMENT PRIMARY KEY,
+
+    Correo_Electronico VARCHAR(100),
+    Contraseña VARCHAR(50),
+    ID_Usuario INT, 
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuario)
+);
+	
+
+
+CREATE TABLE Roles(
+    ID_Rol INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre_Rol VARCHAR(50)
+);
+
+
+CREATE TABLE Usuario_rol(
+    ID_USUARIO INT,
+    ID_Rol INT,
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuario),
+    FOREIGN KEY (ID_Rol) REFERENCES Roles(ID_Rol)	
+);
+
+
+CREATE TABLE Sesion(
+    ID_sesion INT AUTO_INCREMENT PRIMARY KEY,
+    Fecha_hora_ingreso DATETIME,
+    Fecha_hora_cierre DATETIME,
+    Estado ENUM ('Activo', 'Inactivo'),
+    ID_Usuario INT,
+     FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuario)
+
+);
+
+
+
+ CREATE TABLE Material(
+   ID_Material INT AUTO_INCREMENT PRIMARY KEY,	
+   Nombre_material VARCHAR(100),
+   Categoria VARCHAR(50),
+   Unidad_de_media VARCHAR(50)  
+);
+
+
+
+
+CREATE TABLE Inventario(
+    ID_Inventario INT AUTO_INCREMENT PRIMARY KEY,
+    Stock_actual DECIMAL(10,2),
+    Stock_minimo INT,
+    Stock_critico INT,
+    Fecha_actualizacion DATETIME,
+    Estado_stock ENUM(
+        'Disponible',
+        'Bajo',
+        'Critico',
+        'Agotado'),
+   
+    ID_Material INT,
+
+    FOREIGN KEY (ID_Material),
+    REFERENCES Material(ID_Material)
+);
+
+
+
+CREATE TABLE Alertas(
+    ID_Alerta INT AUTO_INCREMENT PRIMARY KEY,
+    Tipo_alerta ENUM('STOCK BAJO','STOCK CRITICO'),
+    Nivel_de_prioridad ENUM ('ALTA','MEDIA','BAJA'),
+    Fecha_generacion DATETIME,
+    Mensaje_alerta ENUM ('Reabastecer material inmediatamente','Compra urgente requerida','Revisar inventario','Solicitar nueva orden de compra','Atención inmediata requerida'),
+	ID_Usuario INT, 
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuario),
+    ID_material INT,
+    FOREIGN KEY (ID_material) REFERENCES material(ID_material),
+
+
+);
+
+
+
+
+
+CREATE TABLE Configuracion_umbrales(
+    ID_Umbral INT AUTO_INCREMENT PRIMARY KEY,
+    Nivel_minimo_permitido INT,
+    Nivel_critico INT,
+    Fecha_configuracion DATETIME,
+    ID_Administrador INT,
+    ID_material INT,
+    FOREIGN KEY (ID_material) REFERENCES material(ID_material)
+
+);
+
+
+
+CREATE TABLE Movimiento_Inventario(
+    ID_Movimiento VARCHAR(20) PRIMARY KEY,
+
+    Tipo_movimiento ENUM('Entrada','Salida'),
+
+    Fecha_hora DATETIME,
+
+    Cantidad DECIMAL(10,2),
+
+    Descripcion_movimiento VARCHAR(255),
+
+    Estado_movimiento ENUM('Completado','Pendiente','Cancelado'),
+
+    ID_Producto INT,
+    ID_Usuario INT,
+
+    FOREIGN KEY (ID_Producto) REFERENCES Material(ID_Material),
+
+    FOREIGN KEY (ID_Usuario) REFERENCES Usuarios(ID_Usuario)
+);
+
+
+CREATE TABLE Reportes(
+    ID_Reporte VARCHAR(20) PRIMARY KEY,
+
+    Fecha_generacion DATETIME,
+
+    Tipo_reporte ENUM(
+        'Inventario General',
+        'Movimientos',
+        'Movimientos Salida',
+        'Stock Critico'),
+
+    Formato_exportacion ENUM('PDF','Excel','CSV'),
+
+    ID_Usuario INT,
+
+    FOREIGN KEY (ID_Usuario) REFERENCES usuarios(ID_Usuario)
+);
+
+
+
+CREATE TABLE Historial(
+    ID_Historial VARCHAR(20) PRIMARY KEY,
+
+    Fecha_registro DATETIME,
+
+    Accion_realizada VARCHAR(255),
+
+    ID_Movimiento VARCHAR(20),
+
+    FOREIGN KEY (ID_Movimiento)
+    REFERENCES Movimiento_Inventario(ID_Movimiento)
+);
+
+
+
+
+
