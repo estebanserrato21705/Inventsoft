@@ -1,0 +1,141 @@
+CREATE DATABASE IF NOT EXISTS taller_sql;
+USE taller_sql;
+-- Eliminar tablas si existen
+DROP TABLE IF EXISTS pedidos;
+DROP TABLE IF EXISTS movimientos;
+DROP TABLE IF EXISTS productos;
+DROP TABLE IF EXISTS usuarios;
+
+-- Tabla usuarios
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    correo VARCHAR(100) UNIQUE NOT NULL,
+    contrasena VARCHAR(100) NOT NULL
+) ENGINE=InnoDB;
+
+-- Tabla productos
+CREATE TABLE productos (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    stock_actual INT NOT NULL
+) ENGINE=InnoDB;
+
+-- Tabla movimientos
+CREATE TABLE movimientos (
+    id_movimiento INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT,
+    tipo VARCHAR(10),
+    cantidad INT,
+    fecha DATE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+) ENGINE=InnoDB;
+
+-- Tabla pedidos
+CREATE TABLE pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT,
+    cantidad INT,
+    fecha DATE,
+    estado VARCHAR(20),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+) ENGINE=InnoDB;
+
+-- Insertar los datos 
+Insert into usuarios (correo, contraseña) VALUES
+ ( 'Juanserrato2105@gmail.com','Jes2105.,@'),
+ ( 'sofia@gmail.com' , 'ABCD'),
+ ( 'luis@gmail.com' , 'pass1'),
+ ( 'ana@gmail.com' , 'pass2'),
+ ( 'carlos@gmail.com' , 'carl123');
+ 
+Insert into productos (nombre, stock_actual ) VALUES
+('Laminas galvanisadas', 20),
+('laminas acero', 30),
+('laminas aluminio', 40),
+('vigas hierro', 50),
+('parales', 100);
+
+ insert into movimientos (Id_producto, tipo, cantidad, fecha) VALUES
+ (1, 'entrada', 10, '2026-02-07'),
+ (2, 'entrada', 15, '2026-02-07'),
+(3, 'entrada', 20, '2026-02-07'),
+(4, 'entrada', 30, '2026-02-07'),
+(5, 'entrada', 50, '2026-02-07');
+
+insert into pedidos (id_producto, cantidad, fecha, estado) VALUES 
+(1, 8, '2026-02-12', 'rechazado'),
+(2, 12, '2026-02-12', 'aprobado'),
+(3, 25, '2026-02-12', 'aprobado'),
+(4, 15, '2026-02-12', 'rechazado'),
+(5, 20, '2026-02-12', 'aprobado');
+
+ 
+ -- A1 listar los productos 
+SELECT id_producto, nombre, stock_actual 
+FROM productos;
+
+ -- A2 Filtro con WHERE 
+SELECT id_producto, nombre, stock_actual 
+FROM productos
+WHERE stock_actual <60;
+
+ -- A3 Condiciones And/or 
+SELECT id_producto, nombre, stock_actual
+FROM productos
+WHERE stock_actual < 110 or nombre = 'laminas acero';
+
+-- A4 ordenar de mayor a menor usando ORDER BY 
+SELECT id_producto, nombre, stock_actual
+FROM productos
+ORDER BY stock_actual DESC;
+
+-- A5 LIKE par buscar fragmentos de texto 
+SELECT id_producto, nombre, stock_actual
+FROM productos
+WHERE NOMBRE LIKE '%g%';
+
+-- A6 Condicion count 
+SELECT COUNT(*) AS total_productos
+FROM productos
+WHERE STOCK_ACTUAL <60; 
+-- A7
+SELECT Tipo, SUM(CANTIDAD) AS total 
+From movimientos
+GROUP BY tipo;  
+
+-- B1 Insertar nuevas filas
+INSERT productos (nombre, stock_actual) VALUES	
+('Tornillos', 200),
+('Tuercas', '150');
+
+-- B2 Modificar un campo en varias filas
+UPDATE productos
+SET stock_actual = stock_actual + 20
+WHERE stock_actual <50;
+
+-- B3 Eliminar una sola fila
+UPDATE productos
+SET nombre = 'producto eliminado'
+WHERE id_producto = 2;
+
+-- C1 Unir dos tablas relacionadas
+Select 
+p.id_pedido,
+pr.nombre,
+p.cantidad,
+p.estado
+FROM pedidos p
+INNER JOIN productos pr 
+ON p.id_producto = pr.id_producto; 
+
+-- C2
+SELECT
+p.id_pedido,
+pr.nombre,
+p.cantidad,
+p.estado 
+FROM pedidos p
+INNER JOIN productos pr
+ON p.id_producto = pr.id_producto
+WHERE p.estado = 'aprobado'
+AND pr.nombre LIKE '%a%';
